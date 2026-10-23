@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Private ♥</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Jost',sans-serif;color:#fff6ec;padding:24px;
+background:radial-gradient(120% 90% at 20% 10%,#7d1736,#4a0c20 45%,#1d0510)}
+.box{text-align:center;max-width:380px;width:100%;padding:44px 28px;border:1px solid rgba(217,178,106,.5);border-radius:22px;background:rgba(255,246,236,.06);backdrop-filter:blur(10px);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+h1{font-family:'Great Vibes',cursive;font-weight:400;font-size:52px;color:#f3dca0}
+p{margin:10px 0 24px;color:#f6d6dc;font-weight:300;letter-spacing:.05em}
+input{width:100%;padding:15px 18px;border-radius:40px;border:1px solid rgba(217,178,106,.6);background:rgba(0,0,0,.25);color:#fff6ec;font-size:16px;text-align:center;outline:none}
+input:focus{border-color:#f3dca0;box-shadow:0 0 0 4px rgba(243,220,160,.15)}
+button{margin-top:16px;width:100%;padding:15px;border:0;border-radius:40px;cursor:pointer;font-size:14px;letter-spacing:.2em;text-transform:uppercase;background:linear-gradient(135deg,#f3dca0,#c9983f);color:#5b0f26;font-weight:500}
+#err{height:20px;margin-top:14px;font-size:14px;color:#ffb3c1}
+.shake{animation:s .4s}@keyframes s{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style></head><body>
+<form class="box" id="f"><h1>For You ♥</h1><p>This page is private. Enter the password.</p>
+<input type="password" id="pw" placeholder="Password" autocomplete="off" autofocus><button>Open</button><div id="err"></div></form>
+<script>
+const D=__DATA__;
+const u=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+document.getElementById('f').addEventListener('submit',async e=>{
+  e.preventDefault();const err=document.getElementById('err'),box=e.currentTarget;err.textContent='Opening…';
+  try{
+    const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('pw').value),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:u(D.s),iterations:D.n,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+    const buf=await crypto.subtle.decrypt({name:'AES-GCM',iv:u(D.i)},key,u(D.c));
+    const html=new TextDecoder().decode(buf);document.open();document.write(html);document.close();
+  }catch(x){err.textContent='Wrong password';box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake')}
+});
+</script></body></html>
